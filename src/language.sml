@@ -3,6 +3,7 @@ type isRec = bool
 
 val recursive = true : isRec
 val nonRecursive = false : isRec
+
 datatype 'a expr 
     = EVar of name
     | ENum of int
@@ -14,8 +15,13 @@ datatype 'a expr
 
 type 'a alter = int * 'a list * 'a expr
 
+(*  bindersOf : ('a * 'b) list -> 'a list  *)
 fun bindersOf (defns : ('a * 'b) list) = map #1 defns
+
+(** rhssOf : ('a * 'b) list -> 'b list  *)
 fun rhssOf (defns : ('a * 'b) list) = map #2 defns
+
+(*  isAtomicExpr : 'a expr -> bool  *)
 fun isAtomicExpr (EVar v) = true
   | isAtomicExpr (ENum n) = true
   | isAtomicExpr _        = false
