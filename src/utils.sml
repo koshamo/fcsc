@@ -34,10 +34,24 @@ fun hUpdate (size, free, cts) a n = (size, free, (a,n) :: remove cts a)
 (*  hFree : 'a heap -> addr -> 'a heap  *)
 fun hFree (size, free, cts) a = (size-1, a::free, remove cts a)
 
-(*  hLookup : 'a heap -> addr -> 'a  *)
-(*  hAddresses : 'a heap -> addr list  *)
-(*  hSize : 'a heap -> int  *)
-(*  hNull : addr  *)
-(*  hIsnull : addr -> bool  *)
 (*  showaddr : addr -> string (* or [char]?*) *)
+fun showaddr a = "#" ^ Int.toString a
+
+(*  hLookup : 'a heap -> addr -> 'a  *)
+fun hLookup (size, free, cts) a =
+        aLookup cts a (raise Fail 
+                        ("can't find node " ^ showaddr a ^ " in heap"))
+
+(*  hAddresses : 'a heap -> addr list  *)
+fun hAddresses (size, free, cts : (int * 'a) list) = map #1 cts
+
+(*  hSize : 'a heap -> int  *)
+fun hSize (size, free, cts) = size
+
+(*  hNull : addr  *)
+val hNull = 0
+
+(*  hIsnull : addr -> bool  *)
+fun hIsnull a = a = 0
+
 
