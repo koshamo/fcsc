@@ -45,3 +45,5 @@ val preludeDefs =
    ("twice", ["f"], EAp (EAp (EVar "compose", EVar "f"), EVar "f"))
   ]
 
+(*  pprint : coreProgram -> string  *)
+
