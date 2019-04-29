@@ -1,14 +1,12 @@
+(* -- general functions -- *)
 (*  zip2 : 'a list * 'b list -> ('a * 'b) list  *)
 val zip2 = ListPair.zip
 
-(* --- *)
+(* -- temporary constants -> TODO: implementing lazy structures -- *)
 val maxHeap = 100
 (* --- *)
 
-(*  makeAddrList : int -> int list -> int list  *)
-fun makeAddrList (0, xs) = 0::xs
-  | makeAddrList (n, xs) = makeAddrList (n-1, n::xs)
-
+(* -- association list -- *)
 type ('a,'b) assoc = ('a * 'b) list
 
 (*  aLookup : assoc -> 'a -> 'b -> 'b  *)
@@ -25,11 +23,17 @@ fun aRange (alist : ('a,'b) assoc) = map #2 alist
 (*  aEmpty : ('a,'b) assoc  *)
 val aEmpty = []
 
+
+(* -- heap -- *)
 (*  remove : (int * 'a) list -> 'a -> (int * 'a) list  *)
 fun remove [] ad = raise Fail ("Attempt to update or free nonexistent address #"
                                ^ Int.toString ad)
   | remove ((a,e)::xs) ad = if a = ad then xs 
                             else (a,e):: remove xs ad
+(*  makeAddrList : int -> int list -> int list  *)
+fun makeAddrList (0, xs) = 0::xs
+  | makeAddrList (n, xs) = makeAddrList (n-1, n::xs)
+
 
 (*   'a heap : (1) number of object 
                (2) list of unused addresses 
