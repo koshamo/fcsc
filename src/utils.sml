@@ -9,7 +9,8 @@ fun makeAddrList (0, xs) = 0::xs
   | makeAddrList (n, xs) = makeAddrList (n-1, n::xs)
 
 (*  remove : (int * 'a) list -> 'a -> (int * 'a) list  *)
-fun remove [] _ = []
+fun remove [] ad = raise Fail ("Attempt to update or free nonexistent address #"
+                               ^ Int.toString ad)
   | remove ((a,e)::xs) ad = if a = ad then xs 
                             else (a,e):: remove xs ad
 
