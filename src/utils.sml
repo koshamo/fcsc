@@ -3,18 +3,33 @@ val zip2 = ListPair.zip
 
 (* --- *)
 val maxHeap = 100
+(* --- *)
 
 (*  makeAddrList : int -> int list -> int list  *)
 fun makeAddrList (0, xs) = 0::xs
   | makeAddrList (n, xs) = makeAddrList (n-1, n::xs)
+
+type ('a,'b) assoc = ('a * 'b) list
+
+(*  aLookup : assoc -> 'a -> 'b -> 'b  *)
+fun aLookup []          key def = def
+  | aLookup ((k,v)::bs) key def = if k = key then v
+                                  else aLookup bs key def
+
+(*  aDomain : ('a,'b) assoc -> 'a list  *)
+fun aDomain (alist : ('a,'b) assoc) = map #1 alist
+
+(*  aRange : ('a,'b) assoc -> 'b list  *)
+fun aRange (alist : ('a,'b) assoc) = map #2 alist
+
+(*  aEmpty : ('a,'b) assoc  *)
+val aEmpty = []
 
 (*  remove : (int * 'a) list -> 'a -> (int * 'a) list  *)
 fun remove [] ad = raise Fail ("Attempt to update or free nonexistent address #"
                                ^ Int.toString ad)
   | remove ((a,e)::xs) ad = if a = ad then xs 
                             else (a,e):: remove xs ad
-
-(* --- *)
 
 (*   'a heap : (1) number of object 
                (2) list of unused addresses 
