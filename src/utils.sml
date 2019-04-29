@@ -75,3 +75,22 @@ val hNull = 0
 fun hIsnull a = a = 0
 
 
+(* -- generating unique names -- *)
+type nameSupply = int
+val initialNameSupply = 0 : nameSupply
+
+(*  makeName : string -> n -> string  *)
+fun makeName pref ns = pref ^ "_" ^ Int.toString ns
+
+(*  makeNameList : string list -> n -> string list  *)
+fun makeNameList [] _ = []
+  | makeNameList (p::ps) n = makeName p n :: makeNameList ps (n+1)
+
+(*  getName : nameSupply -> string -> nameSupply * string  *)
+fun getName nameSup pref = (nameSup+1, makeName pref nameSup)
+
+(*  getNames : nameSupply -> string list -> nameSupply * string list  *)
+fun getNames nameSup prefs = (nameSup + length prefs, makeNameList prefs
+  nameSup)
+  
+
