@@ -2,6 +2,13 @@
 (*  zip2 : 'a list * 'b list -> ('a * 'b) list  *)
 val zip2 = ListPair.zip
 
+(*  sort 'a list -> 'a list  *)
+fun sort [] = []
+  | sort (x::xs) = let val lt = List.filter (fn y => y < x) xs
+                       val gte = List.filter (fn y => y >= x) xs
+                   in sort lt @ [x] @ sort gte
+                   end
+
 (* -- temporary constants -> TODO: implementing lazy structures -- *)
 val maxHeap = 100
 (* --- *)
@@ -94,3 +101,68 @@ fun getNames nameSup prefs = (nameSup + length prefs, makeNameList prefs
   nameSup)
   
 
+(* -- sets -- *)
+type 'a set = 'a list
+
+fun getOrder (a,b) = if a < b then LESS else
+                     if a = b then EQUAL else
+                     GREATER
+
+(*  setFromList : 'a list -> 'a set  *)
+val setFromList  = let fun rmdup [] = []
+                          | rmdup [x] = [x]
+                          | rmdup (x::y::xs) = if x = y then rmdup (y::xs)
+                                               else x :: rmdup (y::xs)
+                    in rmdup o sort 
+                    end
+
+(*  setToList : 'a set -> 'a list  *)
+fun setToList xs = xs
+
+(*  setUnion : 'a set -> 'a set -> 'a set  *)
+fun setUnion [] [] = []
+  | setUnion [] ys = ys
+  | setUnion xs [] = xs
+  | setUnion (x::xs) (y::ys) = case getOrder(x,y) 
+                                 of LESS    => x :: setUnion xs (y::ys)
+                                  | EQUAL   => x :: setUnion xs ys
+                                  | GREATER => y :: setUnion (x::xs) ys
+                                    
+(*  setIntersection : 'a set -> 'a set -> 'a set  *)
+fun setIntersection [] [] = []
+  | setIntersection [] ys = []
+  | setIntersection xs [] = []
+  | setIntersection (x::xs) (y::ys) = 
+                    case getOrder(x,y)
+                      of LESS    => setIntersection xs (y::ys)
+                       | EQUAL   => x :: setIntersection xs ys
+                       | GREATER => setIntersection (x::xs) ys
+
+(*  setSubtraction : 'a set -> 'a set -> 'a set  *)
+fun setSubtraction [] [] = []
+  | setSubtraction [] ys = []
+  | setSubtraction xs [] = xs
+  | setSubtraction (x::xs) (y::ys) = 
+                   case getOrder(x,y)
+                     of LESS    => x :: setSubtraction xs (y::ys)
+                      | EQUAL   => setSubtraction xs ys
+                      | GREATER => setSubtraction (x::xs) ys
+
+(*  setElementOf : 'a -> 'a set -> bool  *)
+fun setElementOf x []      = false
+  | setElementOf x (y::ys) = x = y orelse 
+                             if x > y then setElementOf x ys
+                             else false
+
+(*  setEmpty : 'a set  *)
+val setEmpty = []
+
+(*  setIsEmpty : 'a set -> bool  *)
+fun setIsEmpty s = null s
+
+(*  setSingleton : 'a -> 'a set  *)
+fun setSingleton x = [x]
+
+(*  setUnionList : 'a set list -> 'a set  *)
+(*val setUnionList = foldl setUnion setEmpty*)
+(* TODO: need to implement a foldl, that doesn't use tuples *)
