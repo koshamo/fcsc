@@ -2,6 +2,14 @@
 (*  zip2 : 'a list * 'b list -> ('a * 'b) list  *)
 val zip2 = ListPair.zip
 
+(*  lfold : ('a -> 'b -> 'b) -> 'b -> 'a list -> 'b  *)
+fun lfold f u [] = u
+  | lfold f u (x::xs) = lfold f (f u x) xs
+
+(*  rfold : ('a -> 'b -> 'b) -> 'b -> 'a list -> 'b  *)
+fun rfold f u [] = u
+  | rfold f u (x::xs) = f x (rfold f u xs)
+
 (*  sort 'a list -> 'a list  *)
 fun sort [] = []
   | sort (x::xs) = let val lt = List.filter (fn y => y < x) xs
@@ -164,5 +172,4 @@ fun setIsEmpty s = null s
 fun setSingleton x = [x]
 
 (*  setUnionList : 'a set list -> 'a set  *)
-(*val setUnionList = foldl setUnion setEmpty*)
-(* TODO: need to implement a foldl, that doesn't use tuples *)
+val setUnionList = lfold setUnion setEmpty
