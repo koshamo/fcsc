@@ -1,6 +1,6 @@
 (* -- general functions -- *)
-(*  zip2 : 'a list * 'b list -> ('a * 'b) list  *)
-val zip2 = ListPair.zip
+(*  zip2 : 'a list -> 'b list -> ('a * 'b) list  *)
+fun zip2 a b = ListPair.zip(a,b)
 
 (*  first : 'a * 'b -> 'a  *)
 fun first (a,b) = a
