@@ -2,6 +2,12 @@
 (*  zip2 : 'a list * 'b list -> ('a * 'b) list  *)
 val zip2 = ListPair.zip
 
+(*  first : 'a * 'b -> 'a  *)
+fun first (a,b) = a
+
+(*  second : 'a * 'b -> 'b  *)
+fun second (a,b) = b
+
 (*  lfold : ('a -> 'b -> 'b) -> 'b -> 'a list -> 'b  *)
 fun lfold f u [] = u
   | lfold f u (x::xs) = lfold f (f u x) xs
@@ -10,12 +16,26 @@ fun lfold f u [] = u
 fun rfold f u [] = u
   | rfold f u (x::xs) = f x (rfold f u xs)
 
+(*  mapAccuml : ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list  *)
+fun mapAccuml f acc []      = (acc, [])
+  | mapAccuml f acc (x::xs) = let 
+                                val (acc1, x') = f acc x
+                                val (acc2, xs') = mapAccuml f acc1 xs
+                              in
+                                (acc2, x'::xs')
+                              end
+
 (*  sort 'a list -> 'a list  *)
 fun sort [] = []
   | sort (x::xs) = let val lt = List.filter (fn y => y < x) xs
                        val gte = List.filter (fn y => y >= x) xs
                    in sort lt @ [x] @ sort gte
                    end
+
+(*  space : int -> string  *)
+fun space n = let fun ps c l = if c > 0 then " " ^ ps (c-1) l else l
+              in ps n "" 
+              end
 
 (* -- temporary constants -> TODO: implementing lazy structures -- *)
 val maxHeap = 100
@@ -45,7 +65,7 @@ fun remove [] ad = raise Fail ("Attempt to update or free nonexistent address #"
                                ^ Int.toString ad)
   | remove ((a,e)::xs) ad = if a = ad then xs 
                             else (a,e):: remove xs ad
-(*  makeAddrList : int -> int list -> int list  *)
+(*  makeAddrList : int * int list -> int list  *)
 fun makeAddrList (0, xs) = 0::xs
   | makeAddrList (n, xs) = makeAddrList (n-1, n::xs)
 
