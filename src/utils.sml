@@ -42,20 +42,20 @@ val maxHeap = 100
 (* --- *)
 
 (* -- association list -- *)
-type ('a,'b) assoc = ('a * 'b) list
+type ('a,'b) Assoc = ('a * 'b) list
 
-(*  aLookup : assoc -> 'a -> 'b -> 'b  *)
+(*  aLookup : Assoc -> 'a -> 'b -> 'b  *)
 fun aLookup []          key def = def
   | aLookup ((k,v)::bs) key def = if k = key then v
                                   else aLookup bs key def
 
-(*  aDomain : ('a,'b) assoc -> 'a list  *)
-fun aDomain (alist : ('a,'b) assoc) = map #1 alist
+(*  aDomain : ('a,'b) Assoc -> 'a list  *)
+fun aDomain (alist : ('a,'b) Assoc) = map #1 alist
 
-(*  aRange : ('a,'b) assoc -> 'b list  *)
-fun aRange (alist : ('a,'b) assoc) = map #2 alist
+(*  aRange : ('a,'b) Assoc -> 'b list  *)
+fun aRange (alist : ('a,'b) Assoc) = map #2 alist
 
-(*  aEmpty : ('a,'b) assoc  *)
+(*  aEmpty : ('a,'b) Assoc  *)
 val aEmpty = []
 
 
@@ -65,54 +65,55 @@ fun remove [] ad = raise Fail ("Attempt to update or free nonexistent address #"
                                ^ Int.toString ad)
   | remove ((a,e)::xs) ad = if a = ad then xs 
                             else (a,e):: remove xs ad
+
 (*  makeAddrList : int * int list -> int list  *)
 fun makeAddrList (0, xs) = 0::xs
   | makeAddrList (n, xs) = makeAddrList (n-1, n::xs)
 
 
-(*   'a heap : (1) number of object 
+(*   'a Heap : (1) number of object 
                (2) list of unused addresses 
                (3) assoc list mapping addresses to objects *)
-type 'a heap = int * int list * (int * 'a) list
-type addr = int
+type 'a Heap = int * int list * (int * 'a) list
+type Addr = int
 
-(*  hInitial : 'a heap  *)
+(*  hInitial : 'a Heap  *)
 fun hInitial size = (0, makeAddrList (size,[]), []) 
 
-(*  hAlloc : 'a heap -> 'a -> 'a heap * addr  *)
+(*  hAlloc : 'a Heap -> 'a -> 'a Heap * Addr  *)
 fun hAlloc (size, (next::free), cts) n = 
            ((size+1, free, (next,n) :: cts), next)
 
-(*  hUpdate : 'a heap -> addr -> 'a -> 'a heap  *)
+(*  hUpdate : 'a Heap -> Addr -> 'a -> 'a Heap  *)
 fun hUpdate (size, free, cts) a n = (size, free, (a,n) :: remove cts a)
 
-(*  hFree : 'a heap -> addr -> 'a heap  *)
+(*  hFree : 'a Heap -> Addr -> 'a Heap  *)
 fun hFree (size, free, cts) a = (size-1, a::free, remove cts a)
 
-(*  showaddr : addr -> string (* or [char]?*) *)
+(*  showaddr : Addr -> string (* or [char]?*) *)
 fun showaddr a = "#" ^ Int.toString a
 
-(*  hLookup : 'a heap -> addr -> 'a  *)
+(*  hLookup : 'a Heap -> Addr -> 'a  *)
 fun hLookup (size, free, cts) a =
         aLookup cts a (raise Fail 
                         ("can't find node " ^ showaddr a ^ " in heap"))
 
-(*  hAddresses : 'a heap -> addr list  *)
+(*  hAddresses : 'a Heap -> Addr list  *)
 fun hAddresses (size, free, cts : (int * 'a) list) = map #1 cts
 
-(*  hSize : 'a heap -> int  *)
+(*  hSize : 'a Heap -> int  *)
 fun hSize (size, free, cts) = size
 
-(*  hNull : addr  *)
+(*  hNull : Addr  *)
 val hNull = 0
 
-(*  hIsnull : addr -> bool  *)
+(*  hIsnull : Addr -> bool  *)
 fun hIsnull a = a = 0
 
 
 (* -- generating unique names -- *)
-type nameSupply = int
-val initialNameSupply = 0 : nameSupply
+type NameSupply = int
+val initialNameSupply = 0 : NameSupply
 
 (*  makeName : string -> n -> string  *)
 fun makeName pref ns = pref ^ "_" ^ Int.toString ns
@@ -121,22 +122,22 @@ fun makeName pref ns = pref ^ "_" ^ Int.toString ns
 fun makeNameList [] _ = []
   | makeNameList (p::ps) n = makeName p n :: makeNameList ps (n+1)
 
-(*  getName : nameSupply -> string -> nameSupply * string  *)
+(*  getName : NameSupply -> string -> NameSupply * string  *)
 fun getName nameSup pref = (nameSup+1, makeName pref nameSup)
 
-(*  getNames : nameSupply -> string list -> nameSupply * string list  *)
+(*  getNames : NameSupply -> string list -> NameSupply * string list  *)
 fun getNames nameSup prefs = (nameSup + length prefs, makeNameList prefs
   nameSup)
   
 
 (* -- sets -- *)
-type 'a set = 'a list
+type 'a Set = 'a list
 
 fun getOrder (a,b) = if a < b then LESS else
                      if a = b then EQUAL else
                      GREATER
 
-(*  setFromList : 'a list -> 'a set  *)
+(*  setFromList : 'a list -> 'a Set  *)
 val setFromList  = let fun rmdup [] = []
                           | rmdup [x] = [x]
                           | rmdup (x::y::xs) = if x = y then rmdup (y::xs)
@@ -144,10 +145,10 @@ val setFromList  = let fun rmdup [] = []
                     in rmdup o sort 
                     end
 
-(*  setToList : 'a set -> 'a list  *)
+(*  setToList : 'a Set -> 'a list  *)
 fun setToList xs = xs
 
-(*  setUnion : 'a set -> 'a set -> 'a set  *)
+(*  setUnion : 'a Set -> 'a Set -> 'a Set  *)
 fun setUnion [] [] = []
   | setUnion [] ys = ys
   | setUnion xs [] = xs
@@ -156,7 +157,7 @@ fun setUnion [] [] = []
                                   | EQUAL   => x :: setUnion xs ys
                                   | GREATER => y :: setUnion (x::xs) ys
                                     
-(*  setIntersection : 'a set -> 'a set -> 'a set  *)
+(*  setIntersection : 'a Set -> 'a Set -> 'a Set  *)
 fun setIntersection [] [] = []
   | setIntersection [] ys = []
   | setIntersection xs [] = []
@@ -166,7 +167,7 @@ fun setIntersection [] [] = []
                        | EQUAL   => x :: setIntersection xs ys
                        | GREATER => setIntersection (x::xs) ys
 
-(*  setSubtraction : 'a set -> 'a set -> 'a set  *)
+(*  setSubtraction : 'a Set -> 'a Set -> 'a Set  *)
 fun setSubtraction [] [] = []
   | setSubtraction [] ys = []
   | setSubtraction xs [] = xs
@@ -176,20 +177,20 @@ fun setSubtraction [] [] = []
                       | EQUAL   => setSubtraction xs ys
                       | GREATER => setSubtraction (x::xs) ys
 
-(*  setElementOf : 'a -> 'a set -> bool  *)
+(*  setElementOf : 'a -> 'a Set -> bool  *)
 fun setElementOf x []      = false
   | setElementOf x (y::ys) = x = y orelse 
                              if x > y then setElementOf x ys
                              else false
 
-(*  setEmpty : 'a set  *)
+(*  setEmpty : 'a Set  *)
 val setEmpty = []
 
-(*  setIsEmpty : 'a set -> bool  *)
+(*  setIsEmpty : 'a Set -> bool  *)
 fun setIsEmpty s = null s
 
-(*  setSingleton : 'a -> 'a set  *)
+(*  setSingleton : 'a -> 'a Set  *)
 fun setSingleton x = [x]
 
-(*  setUnionList : 'a set list -> 'a set  *)
+(*  setUnionList : 'a Set list -> 'a Set  *)
 val setUnionList = lfold setUnion setEmpty
