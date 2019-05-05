@@ -45,5 +45,24 @@ val preludeDefs =
    ("twice", ["f"], EAp (EAp (EVar "compose", EVar "f"), EVar "f"))
   ]
 
+
+(* -- PrettyPrinter -- *)
+
+(*  pprExpr : CoreExpr -> string  *)
+fun pprExpr (ENum n) = Int.toString n
+  | pprExpr (EVar v) = v
+  | pprExpr (EAp (e1,e2)) = pprExpr e1 ^ " " ^ pprAExpr e2
+
+(*  pprAExpr : CoreExpr -> String  *)
+and pprAExpr e = if isAtomicExpr e 
+                 then pprExpr e
+                 else "(" ^ pprExpr e ^ ")"
+
+(*  mkExprs : CoreExpr -> CoreExpr Seq Lazy  *)
+fun mkExprs e = Cons (e, fn () => mkExprs e)
+
+(*  mkMultiAp : int -> CoreExpr -> CoreExpr -> CoreExpr  *)
+fun mkMultiAp n e1 e2 = foldl EAp e1 (take n (mkExprs e2))
+
 (*  pprint : CoreProgram -> string  *)
 
