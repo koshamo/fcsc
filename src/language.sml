@@ -48,10 +48,37 @@ val preludeDefs =
 
 (* -- PrettyPrinter -- *)
 
-(*  pprExpr : CoreExpr -> string  *)
-fun pprExpr (ENum n) = Int.toString n
-  | pprExpr (EVar v) = v
-  | pprExpr (EAp (e1,e2)) = pprExpr e1 ^ " " ^ pprAExpr e2
+(*  iNil : Iseq  *)
+(*  iStr : string -> Iseq  *)
+(*  iAppend : Iseq -> Iseq -> ISeq  *)
+(*  iNewline : Iseq  *)
+(*  iIndent : Iseq -> Iseq  *)
+(*  iDisplay : Iseq -> string  *)
+(*  iConcat : Iseq list -> Iseq  *)
+(*  iInterleave : Iseq -> Iseq list -> Iseq  *)
+
+(*  pprDefn : Name * CoreExpr -> Iseq  *)
+fun pprDefn (name,expr) = 
+            iConcat [ iStr name, iStr " = ", iIndent (pprExpr expr) ]
+
+(*  pprDefns : (Name * CoreExpr) list -> Iseq  *)
+and pprDefns defns = let val sep = iConcat [ iStr ";", iNewline ]
+                     in iInterleave sep (map pprDefn defns)
+                     end
+
+(*  pprExpr : CoreExpr -> Iseq  *)
+and pprExpr (ENum n) = iStr Int.toString n
+  | pprExpr (EVar v) = iStr v
+  | pprExpr (EAp (e1,e2)) = iAppend (iAppend pprExpr e1 iStr " ") 
+                                    pprAExpr e2
+  | pprExpr (ELet isrec defns expr) = 
+                let 
+                  val keyword = if isrec then "letrec" else "let" 
+                in
+                  iConcat [ iStr keyword, iNewline,
+                            iStr "  ", iIndent (pprDefns defns), iNewline,
+                            iStr "in ", pprExpr expr ]
+                end
 
 (*  pprAExpr : CoreExpr -> String  *)
 and pprAExpr e = if isAtomicExpr e 
