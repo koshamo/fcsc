@@ -48,11 +48,25 @@ val preludeDefs =
 
 (* -- PrettyPrinter -- *)
 
+datatype Iseq = INil
+              | IStr of string
+              | IAppend of Iseq * Iseq
+
 (*  iNil : Iseq  *)
+val iNil = INil
+
 (*  iStr : string -> Iseq  *)
+fun iStr str = IStr str
+
 (*  iAppend : Iseq -> Iseq -> ISeq  *)
+fun iAppend seq1 seq2 = IAppend (seq1, seq2)
+
 (*  iNewline : Iseq  *)
+val iNewline = IStr "\n"
+
 (*  iIndent : Iseq -> Iseq  *)
+fun iIndent seq = seq
+
 (*  iDisplay : Iseq -> string  *)
 (*  iConcat : Iseq list -> Iseq  *)
 fun iConcat = rfold iAppend iNil
