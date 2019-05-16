@@ -70,14 +70,14 @@ fun iIndent seq = seq
 (*  flatten : Iseq list -> string  *)
 fun flatten [] = ""
   | flatten (INil :: seqs) = flatten seqs
-  | flatten ((s:IStr) :: seqs) = s ^ (flatten seqs)
-  | flatten ((IAppend (seq1,seq2) :: seqs = flatten (seq1 :: seq2 :: seqs)
+  | flatten ((IStr (s)) :: seqs) = s ^ (flatten seqs)
+  | flatten ((IAppend (seq1,seq2)) :: seqs) = flatten (seq1 :: seq2 :: seqs)
 
 (*  iDisplay : Iseq -> string  *)
 fun iDisplay seq = flatten [seq]
 
 (*  iConcat : Iseq list -> Iseq  *)
-fun iConcat = rfold iAppend iNil
+val iConcat = rfold iAppend iNil
 
 (*  iInterleave : Iseq -> Iseq list -> Iseq  *)
 fun iInterleave s [] = iNil
@@ -94,11 +94,11 @@ and pprDefns defns = let val sep = iConcat [ iStr ";", iNewline ]
                      end
 
 (*  pprExpr : CoreExpr -> Iseq  *)
-and pprExpr (ENum n) = iStr Int.toString n
+and pprExpr (ENum n) = iStr (Int.toString n)
   | pprExpr (EVar v) = iStr v
-  | pprExpr (EAp (e1,e2)) = iAppend (iAppend pprExpr e1 iStr " ") 
-                                    pprAExpr e2
-  | pprExpr (ELet isrec defns expr) = 
+  | pprExpr (EAp (e1,e2)) = iAppend (iAppend (pprExpr e1) (iStr " ")) 
+                                    (pprAExpr e2)
+  | pprExpr (ELet (isrec,defns,expr)) = 
                 let 
                   val keyword = if isrec then "letrec" else "let" 
                 in
@@ -110,7 +110,7 @@ and pprExpr (ENum n) = iStr Int.toString n
 (*  pprAExpr : CoreExpr -> String  *)
 and pprAExpr e = if isAtomicExpr e 
                  then pprExpr e
-                 else "(" ^ pprExpr e ^ ")"
+                 else iAppend (iAppend (IStr "(") (pprExpr e)) (IStr ")")
 
 (*  mkExprs : CoreExpr -> CoreExpr Seq Lazy  *)
 fun mkExprs e = Cons (e, fn () => mkExprs e)
