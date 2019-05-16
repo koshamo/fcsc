@@ -55,7 +55,12 @@ val preludeDefs =
 (*  iIndent : Iseq -> Iseq  *)
 (*  iDisplay : Iseq -> string  *)
 (*  iConcat : Iseq list -> Iseq  *)
+fun iConcat = rfold iAppend iNil
+
 (*  iInterleave : Iseq -> Iseq list -> Iseq  *)
+fun iInterleave s [] = iNil
+  | iInterleave s [seq] = seq
+  | iInterleave s (seq::seqs) = iAppend seq (iAppend s (iInterleave s seqs))
 
 (*  pprDefn : Name * CoreExpr -> Iseq  *)
 fun pprDefn (name,expr) = 
@@ -92,4 +97,5 @@ fun mkExprs e = Cons (e, fn () => mkExprs e)
 fun mkMultiAp n e1 e2 = foldl EAp e1 (take n (mkExprs e2))
 
 (*  pprint : CoreProgram -> string  *)
+fun pprint prog = iDisplay (pprProgram prog)
 
