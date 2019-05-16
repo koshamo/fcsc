@@ -67,7 +67,15 @@ val iNewline = IStr "\n"
 (*  iIndent : Iseq -> Iseq  *)
 fun iIndent seq = seq
 
+(*  flatten : Iseq list -> string  *)
+fun flatten [] = ""
+  | flatten (INil :: seqs) = flatten seqs
+  | flatten ((s:IStr) :: seqs) = s ^ (flatten seqs)
+  | flatten ((IAppend (seq1,seq2) :: seqs = flatten (seq1 :: seq2 :: seqs)
+
 (*  iDisplay : Iseq -> string  *)
+fun iDisplay seq = flatten [seq]
+
 (*  iConcat : Iseq list -> Iseq  *)
 fun iConcat = rfold iAppend iNil
 
