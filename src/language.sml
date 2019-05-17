@@ -110,7 +110,7 @@ and pprExpr (ENum n) = iStr (Int.toString n)
 (*  pprAExpr : CoreExpr -> String  *)
 and pprAExpr e = if isAtomicExpr e 
                  then pprExpr e
-                 else iAppend (iAppend (IStr "(") (pprExpr e)) (IStr ")")
+                 else iConcat [ IStr "(", pprExpr e, IStr ")" ]
 
 (*  mkExprs : CoreExpr -> CoreExpr Seq Lazy  *)
 fun mkExprs e = Cons (e, fn () => mkExprs e)
