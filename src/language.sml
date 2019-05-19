@@ -7,7 +7,7 @@ val nonRecursive = false : IsRec
 datatype 'a Expr 
     = EVar of Name
     | ENum of int
-    | EConstr of int * int
+(*    | EConstr of int * int   *)
     | EAp of 'a Expr * 'a Expr
     | ELet of IsRec * ('a * 'a Expr) list * 'a Expr
     | ECase of 'a Expr * (int * 'a list * 'a Expr) list
@@ -61,8 +61,10 @@ fun iNum n = IStr (Int.toString n)
 (*  iStr : string -> Iseq  *)
 fun iStr str = IStr str
 
-(*  iAppend : Iseq -> Iseq -> ISeq  *)
-fun iAppend seq1 seq2 = IAppend (seq1, seq2)
+(*  iAppend : Iseq -> Iseq -> Iseq  *)
+fun iAppend INil seq2 = seq2
+  | iAppend seq1 INil = seq1
+  | iAppend seq1 seq2 = IAppend (seq1, seq2)
 
 (*  iNewline : Iseq  *)
 val iNewline = IStr "\n"
