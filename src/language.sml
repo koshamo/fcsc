@@ -56,7 +56,7 @@ datatype Iseq = INil
 val iNil = INil
 
 (*  iNum : int -> Iseq  *)
-fun iNum n = Int.toString n
+fun iNum n = IStr (Int.toString n)
 
 (*  iStr : string -> Iseq  *)
 fun iStr str = IStr str
@@ -124,7 +124,7 @@ and pprExpr (ENum n) = iNum n
                                   iIndent (iInterleave iNl 
                                     (map pprAlt alter)) ]
                     end
-  | pprExpr (ELam args body) =
+  | pprExpr (ELam (args,body)) =
                     iConcat [ iStr "(\\", pprArgs args, iStr ". ",
                               iIndent (pprExpr body), iStr ")" ]
 
