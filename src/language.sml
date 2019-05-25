@@ -51,6 +51,8 @@ val preludeDefs =
 datatype Iseq = INil
               | IStr of string
               | IAppend of Iseq * Iseq
+              | IIndent of Iseq
+              | INewline
 
 (*  iNil : Iseq  *)
 val iNil = INil
@@ -67,22 +69,29 @@ fun iAppend INil seq2 = seq2
   | iAppend seq1 seq2 = IAppend (seq1, seq2)
 
 (*  iNewline : Iseq  *)
-val iNewline = IStr "\n"
+val iNewline = INewline
 
 (*  iSpace : Iseq  *)
 val iSpace = IStr " "
 
 (*  iIndent : Iseq -> Iseq  *)
-fun iIndent seq = seq
+fun iIndent seq = IIndent seq
 
-(*  flatten : Iseq list -> string  *)
-fun flatten [] = ""
-  | flatten (INil :: seqs) = flatten seqs
-  | flatten ((IStr (s)) :: seqs) = s ^ (flatten seqs)
-  | flatten ((IAppend (seq1,seq2)) :: seqs) = flatten (seq1 :: seq2 :: seqs)
+(*  flatten : int -> (Iseq * int) list -> string  *)
+fun flatten col [] = ""
+  | flatten col ((INil,indent) :: seqs) = 
+            flatten col seqs
+  | flatten col ((IStr (s),indent) :: seqs) = 
+            s ^ (flatten (col + size s) seqs)
+  | flatten col ((IAppend (seq1,seq2),indent) :: seqs) = 
+            flatten col ((seq1,indent) :: (seq2,indent) :: seqs)
+  | flatten col ((INewline,indent) :: seqs) =
+            "\n" ^ (space indent) ^ (flatten indent seqs)
+  | flatten col ((IIndent seq,indent) :: seqs) =
+            flatten col ((seq,col) :: seqs)
 
 (*  iDisplay : Iseq -> string  *)
-fun iDisplay seq = flatten [seq]
+fun iDisplay seq = flatten 0 [(seq,0)]
 
 (*  iConcat : Iseq list -> Iseq  *)
 val iConcat = rfold iAppend iNil
